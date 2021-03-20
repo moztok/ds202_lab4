@@ -1,11 +1,26 @@
+---
+title: "ds202_lab4"
+author: "Oztok"
+date: "3/19/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+chooseCRANmirror(graphics=FALSE, ind=1)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+**LAB #4**
+
+## LOAD THE DATA
+```{r}
 library(readxl)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
-install.packages("compareDF")
 library(compareDF)
 
-##LOAD THE DATA
 defense <- read_excel('cyclonesFootball2020.xlsx', sheet='Defensive')
 str(defense)
 
@@ -14,9 +29,14 @@ str(offensive)
 
 biography <- read_excel('cyclonesFootball2020.xlsx', sheet='Biography')
 str(biography)
+```
+<br>
+<br>
+
 
 #PART ONE: CLEANING THE DATA
 #1
+```{r}
 defense1 <- defense
 offensive1 <- offensive
 biography1 <- biography
@@ -28,9 +48,12 @@ offensive1$Name <-as.factor(offensive1$Name)
 offensive1$Opponent_Opponent <-as.factor(offensive1$Opponent_Opponent)
 
 biography1$Name <-as.factor(biography1$Name)
-
+```
+<br>
+<br>
 
 #2
+```{r}
 defense1 <- defense1 %>%
   mutate(across(Tackles_Solo:Pass_PB, as.numeric))
 
@@ -39,8 +62,12 @@ offensive1 <- offensive1 %>%
 
 biography1 <- biography1 %>%
   mutate(Weight = as.numeric(Weight))
+```
+<br>
+<br>
 
 #3
+```{r}
 biography2 <- biography1
 
 biography2 <- biography2 %>%
@@ -59,12 +86,15 @@ bioClean <- biography2
 str(defClean)
 str(offClean)
 str(bioClean)
+```
+<br>
+<br>
 
 #PART TWO: TIDYING THE DATA
 #1
+```{r}
 offClean1 <- offClean %>%
   pivot_longer(Receiving_REC:Receiving_TD, names_to='receiving_stat', values_to='score')
-View(offClean1)
 
 offClean1 <- offClean1 %>%
   pivot_longer(Rushing_ATT:Rushing_TD, names_to='rushing_stat', values_to='score1')
@@ -73,36 +103,60 @@ offClean1 <- offClean1 %>% rename(Passing_CMPATT = `Passing_CMP-ATT`)
 
 offClean1 <- offClean1 %>%
   pivot_longer(Passing_CMPATT:Passing_INT, names_to='passing_stat', values_to='score2')
+```
+<br>
+<br>
 
 #2
+```{r}
 ggplot(offClean1, aes(x=score)) + geom_histogram() + facet_wrap(~receiving_stat, scales='free_y')
 ggplot(offClean1, aes(x=score1)) + geom_histogram() + facet_wrap(~rushing_stat, scales='free_y')
 ggplot(offClean1, aes(x=score2)) + geom_histogram() + facet_wrap(~passing_stat, scales='free_y')
+```
+<br>
+<br>
 
-######3
+#3
+```{r}
 offClean2 <- offClean1
 
 offClean2  <- offClean2  %>%
   filter(Opponent_Opponent %in% c('Oregon') & receiving_stat == 'score')
+```
+<br>
+<br>
 
 #4
+```{r}
 dat <- bioClean %>%
   separate(Hometown, c('City', 'State'), sep=',')
 str(dat)
+```
+<br>
+<br>
 
 #5
+```{r}
 player_state <- dat %>% count(State, sort = TRUE)
 player_state
-
+```
+<br>
+<br>
 
 #PART THREE: JOINING DATA FRAMES
+<br>
+<br>
 #1
+```{r}
 ggplot(player_state, aes(x=State, y=n)) + geom_point()
+```
+<br>
+<br>
 
 #2
+```{r}
 brock_performance <-  offensive1  %>%
   filter(Name %in% c('Purdy, Brock'))
-View(brock_performance)
 ##QUICK GOOGLE SEARCH SHOWS US IN 2020
 ##ISU WON AGAINST:TCU, OKLAHOMA, TEXAS TECH, KANSAS, BAYLOR, KANSAS STATE, TEXAS, WEST VIRGINIA, OREGON #
 ##ISU LOST AGAINST: LOUSINA, OKLAHOMA STATE,  OKLAHOMA  so  #1, #5 and #11 for our table
@@ -120,8 +174,12 @@ mean(brock_performance$Passing_INT)
 #We can see that he threw 3 interceptions that game which is higher than his average of 0.75 so that could be an explanation why they lost.
 #The other time he threw 3 interceptions, ISU has won because he balanced that with 3 Passing TD and 55 Rushing yards which was his second best yardage for this season.
 
+```
+<br>
+<br>
 
 #3
+```{r}
 #lets clear the data quick
 defense19 <- read_excel('cyclonesFootball2019.xlsx', sheet='Defensive')
 offensive19 <- read_excel('cyclonesFootball2019.xlsx', sheet='Offensive')
@@ -140,12 +198,14 @@ offensive20 <- offensive1
 
 comparetableof_19and20 = compare_df(offensive19, offensive20, c("Name"))
 compare_offense <- comparetableof_19and20$comparison_df
+compare_offense
 
 comparetabledef_19and20 = compare_df(defense19, defense20, c("Name"))
 compare_defense <- comparetabledef_19and20$comparison_df
-
-
-
+compare_defense
+```
+<br>
+<br>
 
 
 
